@@ -11,12 +11,22 @@ namespace Overlay {
     static HWND s_hWnd = nullptr;
     static WNDPROC s_originalWndProc = nullptr;
     static bool s_showOverlay = true;
+    static bool s_customPosition = false;
+    static float s_posX = 0.0f;
+    static float s_posY = 0.0f;
+    static float s_alpha = 0.25f;
+
+    static float Clamp01(float value) {
+        if (value < 0.0f) return 0.0f;
+        if (value > 1.0f) return 1.0f;
+        return value;
+    }
 
     LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
             return true;
 
-        if (msg == WM_KEYDOWN && wParam == VK_F1) {
+        if (msg == WM_KEYDOWN && wParam == VK_F1 && ((lParam & (1LL << 30)) == 0)) {
             s_showOverlay = !s_showOverlay;
         }
 
@@ -56,8 +66,12 @@ namespace Overlay {
         ImGui::NewFrame();
 
         ImGuiIO& io = ImGui::GetIO();
-        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - 8, 8), ImGuiCond_Always, ImVec2(1.0f, 0.0f));
-        ImGui::SetNextWindowBgAlpha(0.25f);
+        if (s_customPosition) {
+            ImGui::SetNextWindowPos(ImVec2(s_posX, s_posY), ImGuiCond_Always, ImVec2(0.0f, 0.0f));
+        } else {
+            ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - 8, 8), ImGuiCond_Always, ImVec2(1.0f, 0.0f));
+        }
+        ImGui::SetNextWindowBgAlpha(s_alpha);
 
         ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
                                   ImGuiWindowFlags_NoResize |
@@ -97,6 +111,20 @@ namespace Overlay {
 
     void CreateDeviceObjects() {
         ImGui_ImplDX11_CreateDeviceObjects();
+    }
+
+    void SetVisible(bool visible) {
+        s_showOverlay = visible;
+    }
+
+    void SetPosition(float x, float y) {
+        s_posX = x;
+        s_posY = y;
+        s_customPosition = true;
+    }
+
+    void SetAlpha(float alpha) {
+        s_alpha = Clamp01(alpha);
     }
 
     void Shutdown() {
