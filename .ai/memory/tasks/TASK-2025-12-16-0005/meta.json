@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "TASK-2025-12-16-0005",
+  "type": "task",
+  "status": "active",
+  "title": "扩展 overlay.ini：显示开关/颜色阈值/字体缩放",
+  "goal": "让 overlay.ini 覆盖剩余常用显示参数：是否显示 FPS/帧时间、颜色阈值、字体缩放。",
+  "non_goals": [
+    "不加载自定义字体文件（仅做全局缩放）",
+    "不做复杂主题/布局（保持极简）"
+  ],
+  "acceptance_criteria": [
+    "overlay.ini 支持 `ShowFps`/`ShowFrameTime`（0/1）控制显示内容",
+    "overlay.ini 支持 `GreenThreshold`/`YellowThreshold`（float）控制颜色分段",
+    "overlay.ini 支持 `FontScale`（float）调整字体大小（默认 1.0）",
+    "无 overlay.ini 或缺省字段时保持当前默认行为",
+    "更新 launcher 的默认 overlay.ini 模板与 docs/USER_GUIDE.md 的说明",
+    "memctl validate/check-stale/build-pack/validate-pack 通过"
+  ],
+  "pack": {
+    "include_memory_ids": [
+      "ADR-0001",
+      "CONSTRAINT-0001",
+      "RUNBOOK-0001"
+    ],
+    "include_paths": [
+      "docs/requirements.md",
+      "README.md",
+      "docs/USER_GUIDE.md",
+      "src/overlay.h",
+      "src/overlay.cpp",
+      "src/launcher/main.cpp",
+      ".ai/README.md",
+      ".ai/config.json",
+      ".ai/tools/memctl.py",
+      ".ai/schemas/agent_report.schema.json",
+      ".github/workflows/ai_memory_validate.yml",
+      ".github/workflows/ai_context_pack.yml",
+      ".github/workflows/ai_pr_gate.yml",
+      ".github/PULL_REQUEST_TEMPLATE/ai.md",
+      "AGENTS.md",
+      "CODEOWNERS",
+      ".gitignore"
+    ]
+  },
+  "evidence": [
+    {
+      "kind": "repo_path",
+      "ref": "docs/requirements.md"
+    }
+  ]
+}
+
