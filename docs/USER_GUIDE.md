@@ -110,6 +110,11 @@ Terraria.exe
 ```ini
 [Overlay]
 Alpha=0.25
+ShowFps=1
+ShowFrameTime=1
+GreenThreshold=60
+YellowThreshold=30
+FontScale=1.0
 Corner=TopRight
 MarginX=8
 MarginY=8
@@ -124,6 +129,11 @@ Visible=1
 
 参数说明：
 - `Alpha`：0..1（窗口背景透明度）
+- `ShowFps`：0/1（是否显示 FPS）
+- `ShowFrameTime`：0/1（是否显示帧时间）
+- `GreenThreshold`：绿色阈值（≥ 此值显示为绿色）
+- `YellowThreshold`：黄色阈值（≥ 此值显示为黄色，否则红色）
+- `FontScale`：字体缩放（默认 1.0）
 - `Corner`：`TopLeft` / `TopRight` / `BottomLeft` / `BottomRight` / `Custom`
 - `MarginX` / `MarginY`：四角模式的边距
 - `X` / `Y`：自定义坐标（仅 `Corner=Custom` 生效）
