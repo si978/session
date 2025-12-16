@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "run_id": "RUN-2025-12-16-0006",
+  "agent_id": "gpt-5.2-codex-cli",
+  "task_id": "TASK-2025-12-16-0006",
+  "context": {
+    "pack_id": "94e733443e5f3a85665a70bdc79d7cbe982ab2776726b2a22e15a8d0f058ffaa",
+    "repo_commit": "9d5fe7abd63c4288131b9d7bae1f881183b134bb"
+  },
+  "changes": [
+    { "path": ".ai/memory/tasks/TASK-2025-12-16-0006/meta.json", "action": "add" },
+    { "path": ".ai/memory/tasks/TASK-2025-12-16-0006/body.md", "action": "add" },
+    { "path": "src/fps_counter.h", "action": "modify" },
+    { "path": "src/fps_counter.cpp", "action": "modify" },
+    { "path": "src/overlay.cpp", "action": "modify" },
+    { "path": "src/launcher/main.cpp", "action": "modify" },
+    { "path": "docs/USER_GUIDE.md", "action": "modify" },
+    { "path": ".ai/evidence/runs/RUN-2025-12-16-0006.agent_report.json", "action": "add" }
+  ],
+  "validation": [
+    {
+      "name": "memctl validate",
+      "status": "pass",
+      "command": "python .ai/tools/memctl.py validate --commit HEAD",
+      "exit_code": 0
+    },
+    {
+      "name": "memctl check-stale",
+      "status": "pass",
+      "command": "python .ai/tools/memctl.py check-stale --commit HEAD",
+      "exit_code": 0
+    },
+    {
+      "name": "memctl build-pack",
+      "status": "pass",
+      "command": "python .ai/tools/memctl.py build-pack --commit HEAD --task-id TASK-2025-12-16-0006 --out context_pack.json",
+      "exit_code": 0
+    },
+    {
+      "name": "memctl validate-pack",
+      "status": "pass",
+      "command": "python .ai/tools/memctl.py validate-pack --pack context_pack.json --task-id TASK-2025-12-16-0006",
+      "exit_code": 0
+    },
+    {
+      "name": "memctl unit tests",
+      "status": "pass",
+      "command": "python -m unittest discover -s .ai/tests -p \"test_*.py\"",
+      "exit_code": 0
+    },
+    {
+      "name": "cmake build",
+      "status": "skipped",
+      "reason": "CMake toolchain not available in this environment"
+    }
+  ],
+  "memory_updates": [
+    { "id": "TASK-2025-12-16-0006", "action": "add" }
+  ]
+}
+
