@@ -27,6 +27,11 @@ namespace Overlay {
     static float s_posY = 0.0f;
     static float s_alpha = 0.25f;
     static int s_toggleKey = VK_F1;
+    static bool s_showFps = true;
+    static bool s_showFrameTime = true;
+    static float s_greenThreshold = 60.0f;
+    static float s_yellowThreshold = 30.0f;
+    static float s_fontScale = 1.0f;
 
     static bool s_configPathReady = false;
     static wchar_t s_configPath[MAX_PATH] = {0};
@@ -42,6 +47,12 @@ namespace Overlay {
 
     static float ClampNonNegative(float value) {
         return value < 0.0f ? 0.0f : value;
+    }
+
+    static float ClampRange(float value, float minValue, float maxValue) {
+        if (value < minValue) return minValue;
+        if (value > maxValue) return maxValue;
+        return value;
     }
 
     static bool TryGetFileWriteTime(const wchar_t* path, FILETIME* out) {
@@ -141,6 +152,26 @@ namespace Overlay {
         float alpha = ReadIniFloat(SECTION, L"Alpha", s_alpha);
         s_alpha = Clamp01(alpha);
 
+        int showFps = GetPrivateProfileIntW(SECTION, L"ShowFps", s_showFps ? 1 : 0, s_configPath);
+        int showFrameTime = GetPrivateProfileIntW(SECTION, L"ShowFrameTime", s_showFrameTime ? 1 : 0, s_configPath);
+        s_showFps = (showFps != 0);
+        s_showFrameTime = (showFrameTime != 0);
+
+        float greenThreshold = ReadIniFloat(SECTION, L"GreenThreshold", s_greenThreshold);
+        float yellowThreshold = ReadIniFloat(SECTION, L"YellowThreshold", s_yellowThreshold);
+        greenThreshold = ClampNonNegative(greenThreshold);
+        yellowThreshold = ClampNonNegative(yellowThreshold);
+        if (greenThreshold < yellowThreshold) {
+            float tmp = greenThreshold;
+            greenThreshold = yellowThreshold;
+            yellowThreshold = tmp;
+        }
+        s_greenThreshold = greenThreshold;
+        s_yellowThreshold = yellowThreshold;
+
+        float fontScale = ReadIniFloat(SECTION, L"FontScale", s_fontScale);
+        s_fontScale = ClampRange(fontScale, 0.5f, 5.0f);
+
         float marginX = ReadIniFloat(SECTION, L"MarginX", s_marginX);
         float marginY = ReadIniFloat(SECTION, L"MarginY", s_marginY);
         s_marginX = ClampNonNegative(marginX);
@@ -231,12 +262,14 @@ namespace Overlay {
     void Render() {
         MaybeReloadConfig();
         if (!s_showOverlay) return;
+        if (!s_showFps && !s_showFrameTime) return;
 
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
         ImGuiIO& io = ImGui::GetIO();
+        io.FontGlobalScale = s_fontScale;
         if (s_positionMode == PositionMode::Custom) {
             ImGui::SetNextWindowPos(ImVec2(s_posX, s_posY), ImGuiCond_Always, ImVec2(0.0f, 0.0f));
         } else {
@@ -263,16 +296,20 @@ namespace Overlay {
             float frameTimeMs = FpsCounter::GetDisplayFrameTime();
 
             ImVec4 textColor;
-            if (fps >= 60.0f) {
+            if (fps >= s_greenThreshold) {
                 textColor = ImVec4(0.2f, 1.0f, 0.2f, 1.0f);
-            } else if (fps >= 30.0f) {
+            } else if (fps >= s_yellowThreshold) {
                 textColor = ImVec4(1.0f, 1.0f, 0.2f, 1.0f);
             } else {
                 textColor = ImVec4(1.0f, 0.2f, 0.2f, 1.0f);
             }
 
-            ImGui::TextColored(textColor, "FPS: %.1f", fps);
-            ImGui::TextColored(textColor, "Frame: %.1f ms", frameTimeMs);
+            if (s_showFps) {
+                ImGui::TextColored(textColor, "FPS: %.1f", fps);
+            }
+            if (s_showFrameTime) {
+                ImGui::TextColored(textColor, "Frame: %.1f ms", frameTimeMs);
+            }
         }
         ImGui::End();
 

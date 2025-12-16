@@ -145,6 +145,17 @@ void CreateDefaultOverlayConfig(const std::wstring& configPath) {
     file << L"; 0..1 (window background alpha)\n";
     file << L"Alpha=0.25\n";
     file << L"\n";
+    file << L"; 0/1\n";
+    file << L"ShowFps=1\n";
+    file << L"ShowFrameTime=1\n";
+    file << L"\n";
+    file << L"; Color thresholds\n";
+    file << L"GreenThreshold=60\n";
+    file << L"YellowThreshold=30\n";
+    file << L"\n";
+    file << L"; Font scale (default 1.0)\n";
+    file << L"FontScale=1.0\n";
+    file << L"\n";
     file << L"; Corner: TopLeft, TopRight, BottomLeft, BottomRight, Custom\n";
     file << L"Corner=TopRight\n";
     file << L"MarginX=8\n";
