@@ -115,6 +115,8 @@ ShowFrameTime=1
 GreenThreshold=60
 YellowThreshold=30
 FontScale=1.0
+SampleCount=60
+DisplayUpdateMs=80
 Corner=TopRight
 MarginX=8
 MarginY=8
@@ -134,6 +136,8 @@ Visible=1
 - `GreenThreshold`：绿色阈值（≥ 此值显示为绿色）
 - `YellowThreshold`：黄色阈值（≥ 此值显示为黄色，否则红色）
 - `FontScale`：字体缩放（默认 1.0）
+- `SampleCount`：FPS 平滑采样长度（帧数）
+- `DisplayUpdateMs`：显示值刷新周期（毫秒）
 - `Corner`：`TopLeft` / `TopRight` / `BottomLeft` / `BottomRight` / `Custom`
 - `MarginX` / `MarginY`：四角模式的边距
 - `X` / `Y`：自定义坐标（仅 `Corner=Custom` 生效）

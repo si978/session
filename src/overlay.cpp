@@ -5,6 +5,7 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 #include <cstdio>
+#include <cstddef>
 #include <cwctype>
 #include <cwchar>
 
@@ -171,6 +172,11 @@ namespace Overlay {
 
         float fontScale = ReadIniFloat(SECTION, L"FontScale", s_fontScale);
         s_fontScale = ClampRange(fontScale, 0.5f, 5.0f);
+
+        int sampleCount = GetPrivateProfileIntW(SECTION, L"SampleCount", 60, s_configPath);
+        int displayUpdateMs = GetPrivateProfileIntW(SECTION, L"DisplayUpdateMs", 80, s_configPath);
+        FpsCounter::SetSampleCount(static_cast<size_t>(sampleCount));
+        FpsCounter::SetDisplayUpdateMs(static_cast<long long>(displayUpdateMs));
 
         float marginX = ReadIniFloat(SECTION, L"MarginX", s_marginX);
         float marginY = ReadIniFloat(SECTION, L"MarginY", s_marginY);

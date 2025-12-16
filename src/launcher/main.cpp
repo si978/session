@@ -156,6 +156,10 @@ void CreateDefaultOverlayConfig(const std::wstring& configPath) {
     file << L"; Font scale (default 1.0)\n";
     file << L"FontScale=1.0\n";
     file << L"\n";
+    file << L"; FPS smoothing\n";
+    file << L"SampleCount=60\n";
+    file << L"DisplayUpdateMs=80\n";
+    file << L"\n";
     file << L"; Corner: TopLeft, TopRight, BottomLeft, BottomRight, Custom\n";
     file << L"Corner=TopRight\n";
     file << L"MarginX=8\n";
