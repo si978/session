@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "run_id": "RUN-2025-12-16-0004",
+  "agent_id": "gpt-5.2-codex-cli",
+  "task_id": "TASK-2025-12-16-0004",
+  "context": {
+    "pack_id": "8f599cb55607cfd42983370095d1f0cf43a60322710a4d148058458506ca4f8c",
+    "repo_commit": "e283da6b1e01e6dd2f88e4a5bda7d6176a78e547"
+  },
+  "changes": [
+    { "path": ".ai/memory/tasks/TASK-2025-12-16-0004/meta.json", "action": "add" },
+    { "path": ".ai/memory/tasks/TASK-2025-12-16-0004/body.md", "action": "add" },
+    { "path": "src/overlay.cpp", "action": "modify" },
+    { "path": "src/launcher/main.cpp", "action": "modify" },
+    { "path": "docs/USER_GUIDE.md", "action": "modify" },
+    { "path": "README.md", "action": "modify" },
+    { "path": ".ai/evidence/runs/RUN-2025-12-16-0004.agent_report.json", "action": "add" }
+  ],
+  "validation": [
+    {
+      "name": "memctl validate",
+      "status": "pass",
+      "command": "python .ai/tools/memctl.py validate --commit HEAD",
+      "exit_code": 0
+    },
+    {
+      "name": "memctl check-stale",
+      "status": "pass",
+      "command": "python .ai/tools/memctl.py check-stale --commit HEAD",
+      "exit_code": 0
+    },
+    {
+      "name": "memctl build-pack",
+      "status": "pass",
+      "command": "python .ai/tools/memctl.py build-pack --commit HEAD --task-id TASK-2025-12-16-0004 --out context_pack.json",
+      "exit_code": 0
+    },
+    {
+      "name": "memctl validate-pack",
+      "status": "pass",
+      "command": "python .ai/tools/memctl.py validate-pack --pack context_pack.json --task-id TASK-2025-12-16-0004",
+      "exit_code": 0
+    },
+    {
+      "name": "memctl unit tests",
+      "status": "pass",
+      "command": "python -m unittest discover -s .ai/tests -p \"test_*.py\"",
+      "exit_code": 0
+    },
+    {
+      "name": "cmake build",
+      "status": "skipped",
+      "reason": "CMake toolchain not available in this environment"
+    }
+  ],
+  "memory_updates": [
+    { "id": "TASK-2025-12-16-0004", "action": "add" }
+  ]
+}
+
