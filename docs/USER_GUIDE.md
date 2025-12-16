@@ -75,6 +75,8 @@ Cuphead.exe
 | 选项 | 说明 |
 |------|------|
 | Edit games.txt | 编辑游戏配置文件 |
+| Edit overlay.ini | 编辑叠加层配置 |
+| Reload config | 重新加载 games.txt |
 | Exit | 退出程序 |
 
 ### 游戏内操作
@@ -98,6 +100,35 @@ HollowKnight.exe
 Cuphead.exe
 Terraria.exe
 ```
+
+### overlay.ini（叠加层设置）
+
+`overlay.ini` 位于 `fps_overlay.dll` 同目录，修改后会在游戏内自动热更新（≤ 1s）。
+
+示例：
+
+```ini
+[Overlay]
+Alpha=0.25
+Corner=TopRight
+MarginX=8
+MarginY=8
+ToggleKey=F1
+Visible=1
+
+; 自定义坐标（左上为原点）
+; Corner=Custom
+; X=10
+; Y=10
+```
+
+参数说明：
+- `Alpha`：0..1（窗口背景透明度）
+- `Corner`：`TopLeft` / `TopRight` / `BottomLeft` / `BottomRight` / `Custom`
+- `MarginX` / `MarginY`：四角模式的边距
+- `X` / `Y`：自定义坐标（仅 `Corner=Custom` 生效）
+- `ToggleKey`：`F1`~`F12`（或直接填 VK 数字）
+- `Visible`：0/1
 
 ### 如何查找游戏进程名
 

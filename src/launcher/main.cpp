@@ -10,6 +10,7 @@
 #define WM_TRAYICON (WM_USER + 1)
 #define ID_TRAY_EXIT 1001
 #define ID_TRAY_CONFIG 1002
+#define ID_TRAY_OVERLAY_CONFIG 1004
 #define ID_TRAY_RELOAD 1003
 
 NOTIFYICONDATAW g_nid = {0};
@@ -18,6 +19,7 @@ bool g_running = true;
 std::wstring g_exeDir;
 std::wstring g_dllPath;
 std::wstring g_configPath;
+std::wstring g_overlayConfigPath;
 std::vector<std::wstring> g_games;
 std::set<DWORD> g_injectedPids;
 FILETIME g_lastConfigTime = {0};
@@ -134,6 +136,32 @@ void CreateDefaultConfig(const std::wstring& configPath) {
     file.close();
 }
 
+void CreateDefaultOverlayConfig(const std::wstring& configPath) {
+    std::wofstream file(configPath);
+    file << L"; FPS Overlay - Overlay Settings\n";
+    file << L"; This file is read by fps_overlay.dll (auto-reloads on change).\n";
+    file << L"\n";
+    file << L"[Overlay]\n";
+    file << L"; 0..1 (window background alpha)\n";
+    file << L"Alpha=0.25\n";
+    file << L"\n";
+    file << L"; Corner: TopLeft, TopRight, BottomLeft, BottomRight, Custom\n";
+    file << L"Corner=TopRight\n";
+    file << L"MarginX=8\n";
+    file << L"MarginY=8\n";
+    file << L"\n";
+    file << L"; Used when Corner=Custom\n";
+    file << L"X=10\n";
+    file << L"Y=10\n";
+    file << L"\n";
+    file << L"; ToggleKey: F1-F12 (or a VK code number)\n";
+    file << L"ToggleKey=F1\n";
+    file << L"\n";
+    file << L"; 0/1\n";
+    file << L"Visible=1\n";
+    file.close();
+}
+
 void ShowNotification(const wchar_t* title, const wchar_t* msg) {
     g_nid.uFlags = NIF_INFO;
     wcscpy_s(g_nid.szInfoTitle, title);
@@ -218,6 +246,7 @@ void ShowContextMenu(HWND hWnd) {
     
     HMENU hMenu = CreatePopupMenu();
     AppendMenuW(hMenu, MF_STRING, ID_TRAY_CONFIG, L"Edit games.txt");
+    AppendMenuW(hMenu, MF_STRING, ID_TRAY_OVERLAY_CONFIG, L"Edit overlay.ini");
     AppendMenuW(hMenu, MF_STRING, ID_TRAY_RELOAD, L"Reload config");
     AppendMenuW(hMenu, MF_SEPARATOR, 0, nullptr);
     AppendMenuW(hMenu, MF_STRING, ID_TRAY_EXIT, L"Exit");
@@ -244,6 +273,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             break;
         case ID_TRAY_CONFIG:
             ShellExecuteW(nullptr, L"open", L"notepad.exe", g_configPath.c_str(), nullptr, SW_SHOW);
+            break;
+        case ID_TRAY_OVERLAY_CONFIG:
+            ShellExecuteW(nullptr, L"open", L"notepad.exe", g_overlayConfigPath.c_str(), nullptr, SW_SHOW);
             break;
         case ID_TRAY_RELOAD:
             ReloadConfig();
@@ -281,6 +313,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     g_exeDir = GetExeDir();
     g_dllPath = g_exeDir + L"fps_overlay.dll";
     g_configPath = g_exeDir + L"games.txt";
+    g_overlayConfigPath = g_exeDir + L"overlay.ini";
     
     // Check DLL
     if (GetFileAttributesW(g_dllPath.c_str()) == INVALID_FILE_ATTRIBUTES) {
@@ -296,6 +329,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
             L"FPS Overlay", MB_ICONINFORMATION);
         ShellExecuteW(nullptr, L"open", L"notepad.exe", g_configPath.c_str(), nullptr, SW_SHOW);
         return 0;
+    }
+
+    // Create overlay config if not exists
+    if (GetFileAttributesW(g_overlayConfigPath.c_str()) == INVALID_FILE_ATTRIBUTES) {
+        CreateDefaultOverlayConfig(g_overlayConfigPath);
     }
     
     // Load games
