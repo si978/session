@@ -4,6 +4,6 @@ namespace FpsCounter {
     void Update();
     float GetFps();
     float GetFrameTime();
-    int GetDisplayFps();       // For display (updated every 300ms)
+    float GetDisplayFps();     // For display (smoothed, updated periodically)
     float GetDisplayFrameTime();
 }
