@@ -1,0 +1,20 @@
+ 方法 1：运行清理脚本
+
+     D:\droid\fps-fresh\lab\src\global_hook\cleanup.bat
+
+   方法 2：手动命令
+
+   cmd
+     :: 查看占用进程
+     tasklist /m fps_hook64.dll
+     tasklist /m fps_hook32.dll
+
+     :: 关闭占用进程（根据列表）
+     taskkill /F /IM 进程名.exe
+
+   方法 3：常见占用进程一键清理
+
+   cmd
+     taskkill /F /IM WidgetService.exe
+     taskkill /F /IM DataExchangeHost.exe
+     taskkill /F /IM fps_monitor.exe

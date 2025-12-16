@@ -1,0 +1,48 @@
+name: Build AI Context Pack
+
+on:
+  workflow_dispatch:
+    inputs:
+      task_id:
+        description: "Task ID (e.g. TASK-2025-12-15-0001)"
+        required: true
+      commit:
+        description: "Commit/ref to build from (default: workflow sha)"
+        required: false
+        default: ""
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build pack
+        shell: bash
+        run: |
+          COMMIT="${{ inputs.commit }}"
+          if [ -z "$COMMIT" ]; then COMMIT="${{ github.sha }}"; fi
+          python .ai/tools/memctl.py build-pack --commit "$COMMIT" --task-id "${{ inputs.task_id }}" --out "context_pack.json"
+          python .ai/tools/memctl.py build-pack --commit "$COMMIT" --task-id "${{ inputs.task_id }}" --out "context_pack_2.json"
+          python .ai/tools/memctl.py validate-pack --pack "context_pack.json" --task-id "${{ inputs.task_id }}"
+          python - <<'PY'
+          import hashlib
+          a = open("context_pack.json","rb").read()
+          b = open("context_pack_2.json","rb").read()
+          ha = hashlib.sha256(a).hexdigest()
+          hb = hashlib.sha256(b).hexdigest()
+          if ha != hb:
+              raise SystemExit(f"non-deterministic build-pack output: {ha} vs {hb}")
+          print(f"OK: deterministic context pack output sha256={ha}")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: context_pack_${{ inputs.task_id }}_${{ github.sha }}
+          path: context_pack.json

@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": "TASK-2025-12-16-0001",
+  "type": "task",
+  "status": "active",
+  "title": "为 fps-fresh 引入 AI 记忆与一致性工作流（V1）",
+  "goal": "在本仓库落地 repo-first 记忆 + 确定性 context pack + GitHub PR 门禁，使 Codex CLI 可从 docs/requirements.md 驱动长期迭代。",
+  "non_goals": [
+    "本任务不实现业务功能（FPS overlay 功能改动另开 TASK）"
+  ],
+  "acceptance_criteria": [
+    "仓库包含 .ai/**、.github/workflows/ai_*.yml、AGENTS.md、CODEOWNERS、并更新 .gitignore",
+    "`python .ai/tools/memctl.py validate --commit HEAD` 通过",
+    "`python .ai/tools/memctl.py check-stale --commit HEAD` 通过",
+    "可为本任务生成并通过校验的 context_pack.json（build-pack + validate-pack）"
+  ],
+  "pack": {
+    "include_memory_ids": [
+      "ADR-0001",
+      "CONSTRAINT-0001",
+      "RUNBOOK-0001"
+    ],
+    "include_paths": [
+      "docs/requirements.md",
+      "README.md",
+      "CMakeLists.txt",
+      ".ai/README.md",
+      ".ai/config.json",
+      ".ai/schemas/agent_report.schema.json",
+      ".ai/tools/memctl.py",
+      ".github/workflows/ai_memory_validate.yml",
+      ".github/workflows/ai_context_pack.yml",
+      ".github/workflows/ai_pr_gate.yml",
+      ".github/PULL_REQUEST_TEMPLATE/ai.md",
+      "AGENTS.md",
+      "CODEOWNERS",
+      ".gitignore"
+    ]
+  },
+  "evidence": [
+    {
+      "kind": "repo_path",
+      "ref": "docs/requirements.md"
+    }
+  ]
+}
+

@@ -1,0 +1,5 @@
+# Default owners for the AI memory system surfaces (adjust as needed).
+.ai/memory/              @si978
+.ai/tools/               @si978
+.github/workflows/ai_    @si978
+

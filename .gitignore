@@ -1,0 +1,55 @@
+# Build outputs
+build/
+out/
+bin/
+lib/
+
+# Lab build outputs
+lab/build/
+lab/src/global_hook/build/
+lab/src/global_hook/build32/
+lab/src/global_hook/build64/
+lab/src/global_hook/output/
+lab/src/global_hook/output2/
+lab/src/global_hook/output3/
+
+# Visual Studio
+.vs/
+*.vcxproj.user
+*.suo
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+# Dependencies (downloaded separately)
+third_party/minhook/src/
+third_party/minhook/include/MinHook.h
+third_party/imgui/*.cpp
+third_party/imgui/*.h
+third_party/imgui/backends/
+
+# Keep placeholder files
+!**/.gitkeep
+!**/README.md
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*~
+
+# AI memory kit
+.ai/packs/
+.ai/state/
+context_pack*.json
+*.pyc
+__pycache__/
