@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "id": "TASK-2025-12-16-0003",
+  "type": "task",
+  "status": "active",
+  "title": "补齐 Overlay API + 热键防抖（V1）",
+  "goal": "按需求文档补齐 Overlay 模块的基础控制接口（visible/position/alpha），并避免 F1 按住导致重复切换。",
+  "non_goals": [
+    "不实现完整配置系统（INI/JSON 持久化另开 TASK）",
+    "不调整 UI 风格或默认位置/透明度（保持现状）"
+  ],
+  "acceptance_criteria": [
+    "提供 Overlay::SetVisible/SetPosition/SetAlpha API（与需求文档 6.5 一致）",
+    "默认渲染效果不变（未调用 API 时行为与当前一致）",
+    "按住 F1 不会反复切换（仅一次切换）",
+    "memctl validate/check-stale/build-pack/validate-pack 通过"
+  ],
+  "pack": {
+    "include_memory_ids": [
+      "ADR-0001",
+      "CONSTRAINT-0001",
+      "RUNBOOK-0001"
+    ],
+    "include_paths": [
+      "docs/requirements.md",
+      "src/overlay.h",
+      "src/overlay.cpp",
+      "src/hooks.h",
+      "src/hooks.cpp",
+      ".ai/README.md",
+      ".ai/config.json",
+      ".ai/tools/memctl.py",
+      ".ai/schemas/agent_report.schema.json",
+      ".github/workflows/ai_memory_validate.yml",
+      ".github/workflows/ai_context_pack.yml",
+      ".github/workflows/ai_pr_gate.yml",
+      ".github/PULL_REQUEST_TEMPLATE/ai.md",
+      "AGENTS.md",
+      "CODEOWNERS",
+      ".gitignore"
+    ]
+  },
+  "evidence": [
+    {
+      "kind": "repo_path",
+      "ref": "docs/requirements.md"
+    }
+  ]
+}
+

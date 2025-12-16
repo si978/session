@@ -8,4 +8,7 @@ namespace Overlay {
     void Shutdown();
     void InvalidateDeviceObjects();
     void CreateDeviceObjects();
+    void SetVisible(bool visible);
+    void SetPosition(float x, float y);
+    void SetAlpha(float alpha);
 }
