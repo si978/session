@@ -1,20 +1,38 @@
 #include "overlay.h"
 #include "fps_counter.h"
+#include "hooks.h"
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 #include <cstdio>
+#include <cwctype>
+#include <cwchar>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace Overlay {
+    enum class PositionMode {
+        Corner,
+        Custom,
+    };
+
     static HWND s_hWnd = nullptr;
     static WNDPROC s_originalWndProc = nullptr;
     static bool s_showOverlay = true;
-    static bool s_customPosition = false;
+    static PositionMode s_positionMode = PositionMode::Corner;
+    static int s_corner = 1;
+    static float s_marginX = 8.0f;
+    static float s_marginY = 8.0f;
     static float s_posX = 0.0f;
     static float s_posY = 0.0f;
     static float s_alpha = 0.25f;
+    static int s_toggleKey = VK_F1;
+
+    static bool s_configPathReady = false;
+    static wchar_t s_configPath[MAX_PATH] = {0};
+    static FILETIME s_configWriteTime = {0};
+    static ULONGLONG s_lastConfigCheckTick = 0;
+    static bool s_configLoaded = false;
 
     static float Clamp01(float value) {
         if (value < 0.0f) return 0.0f;
@@ -22,11 +40,153 @@ namespace Overlay {
         return value;
     }
 
+    static float ClampNonNegative(float value) {
+        return value < 0.0f ? 0.0f : value;
+    }
+
+    static bool TryGetFileWriteTime(const wchar_t* path, FILETIME* out) {
+        WIN32_FILE_ATTRIBUTE_DATA data;
+        if (!GetFileAttributesExW(path, GetFileExInfoStandard, &data)) {
+            return false;
+        }
+        *out = data.ftLastWriteTime;
+        return true;
+    }
+
+    static void InitConfigPath() {
+        if (s_configPathReady) return;
+        if (!Hooks::g_hModule) return;
+
+        wchar_t modulePath[MAX_PATH] = {0};
+        DWORD len = GetModuleFileNameW(Hooks::g_hModule, modulePath, MAX_PATH);
+        if (len == 0 || len >= MAX_PATH) return;
+
+        wchar_t* lastSlash = wcsrchr(modulePath, L'\\');
+        wchar_t* lastSlash2 = wcsrchr(modulePath, L'/');
+        if (!lastSlash || (lastSlash2 && lastSlash2 > lastSlash)) lastSlash = lastSlash2;
+        if (!lastSlash) return;
+
+        *(lastSlash + 1) = L'\0';
+        swprintf_s(s_configPath, L"%soverlay.ini", modulePath);
+        s_configPathReady = true;
+    }
+
+    static bool TryParseFloat(const wchar_t* text, float* out) {
+        if (!text || !out) return false;
+        wchar_t* end = nullptr;
+        float v = wcstof(text, &end);
+        if (end == text) return false;
+        *out = v;
+        return true;
+    }
+
+    static float ReadIniFloat(const wchar_t* section, const wchar_t* key, float def) {
+        wchar_t defBuf[32];
+        swprintf_s(defBuf, L"%.3f", def);
+
+        wchar_t buf[64];
+        GetPrivateProfileStringW(section, key, defBuf, buf, static_cast<DWORD>(sizeof(buf) / sizeof(buf[0])), s_configPath);
+
+        float v = def;
+        if (TryParseFloat(buf, &v)) return v;
+        return def;
+    }
+
+    static int ParseCorner(const wchar_t* text) {
+        if (!text) return -1;
+        while (*text && iswspace(*text)) text++;
+        if (!*text) return -1;
+
+        if (_wcsicmp(text, L"Custom") == 0) return 4;
+        if (_wcsicmp(text, L"TopLeft") == 0) return 0;
+        if (_wcsicmp(text, L"TopRight") == 0) return 1;
+        if (_wcsicmp(text, L"BottomLeft") == 0) return 2;
+        if (_wcsicmp(text, L"BottomRight") == 0) return 3;
+
+        if (_wcsicmp(text, L"TL") == 0) return 0;
+        if (_wcsicmp(text, L"TR") == 0) return 1;
+        if (_wcsicmp(text, L"BL") == 0) return 2;
+        if (_wcsicmp(text, L"BR") == 0) return 3;
+
+        return -1;
+    }
+
+    static int ParseToggleKey(const wchar_t* text) {
+        if (!text) return VK_F1;
+        while (*text && iswspace(*text)) text++;
+        if (!*text) return VK_F1;
+
+        wchar_t* end = nullptr;
+        long numeric = wcstol(text, &end, 10);
+        if (end != text && numeric > 0 && numeric < 256) {
+            return static_cast<int>(numeric);
+        }
+
+        if ((text[0] == L'F' || text[0] == L'f') && iswdigit(text[1])) {
+            int n = _wtoi(text + 1);
+            if (n >= 1 && n <= 12) return VK_F1 + (n - 1);
+        }
+
+        return VK_F1;
+    }
+
+    static void LoadConfigFromIni() {
+        if (!s_configPathReady) return;
+
+        constexpr const wchar_t* SECTION = L"Overlay";
+
+        int visible = GetPrivateProfileIntW(SECTION, L"Visible", s_showOverlay ? 1 : 0, s_configPath);
+        s_showOverlay = (visible != 0);
+
+        float alpha = ReadIniFloat(SECTION, L"Alpha", s_alpha);
+        s_alpha = Clamp01(alpha);
+
+        float marginX = ReadIniFloat(SECTION, L"MarginX", s_marginX);
+        float marginY = ReadIniFloat(SECTION, L"MarginY", s_marginY);
+        s_marginX = ClampNonNegative(marginX);
+        s_marginY = ClampNonNegative(marginY);
+
+        wchar_t cornerBuf[32] = {0};
+        GetPrivateProfileStringW(SECTION, L"Corner", L"", cornerBuf, static_cast<DWORD>(sizeof(cornerBuf) / sizeof(cornerBuf[0])), s_configPath);
+        int corner = ParseCorner(cornerBuf);
+        if (corner >= 0 && corner <= 3) {
+            s_corner = corner;
+            s_positionMode = PositionMode::Corner;
+        } else if (corner == 4) {
+            float x = ReadIniFloat(SECTION, L"X", s_posX);
+            float y = ReadIniFloat(SECTION, L"Y", s_posY);
+            s_posX = x;
+            s_posY = y;
+            s_positionMode = PositionMode::Custom;
+        }
+
+        wchar_t keyBuf[32] = {0};
+        GetPrivateProfileStringW(SECTION, L"ToggleKey", L"F1", keyBuf, static_cast<DWORD>(sizeof(keyBuf) / sizeof(keyBuf[0])), s_configPath);
+        s_toggleKey = ParseToggleKey(keyBuf);
+    }
+
+    static void MaybeReloadConfig() {
+        if (!s_configPathReady) return;
+
+        ULONGLONG nowTick = GetTickCount64();
+        if (nowTick - s_lastConfigCheckTick < 1000) return;
+        s_lastConfigCheckTick = nowTick;
+
+        FILETIME ft = {0};
+        if (!TryGetFileWriteTime(s_configPath, &ft)) return;
+
+        if (!s_configLoaded || CompareFileTime(&ft, &s_configWriteTime) != 0) {
+            s_configWriteTime = ft;
+            LoadConfigFromIni();
+            s_configLoaded = true;
+        }
+    }
+
     LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
             return true;
 
-        if (msg == WM_KEYDOWN && wParam == VK_F1 && ((lParam & (1LL << 30)) == 0)) {
+        if (msg == WM_KEYDOWN && wParam == static_cast<WPARAM>(s_toggleKey) && ((lParam & (1LL << 30)) == 0)) {
             s_showOverlay = !s_showOverlay;
         }
 
@@ -54,22 +214,37 @@ namespace Overlay {
         ImGui_ImplWin32_Init(hWnd);
         ImGui_ImplDX11_Init(pDevice, pContext);
 
+        InitConfigPath();
+        if (s_configPathReady) {
+            FILETIME ft = {0};
+            if (TryGetFileWriteTime(s_configPath, &ft)) {
+                s_configWriteTime = ft;
+                LoadConfigFromIni();
+                s_configLoaded = true;
+                s_lastConfigCheckTick = GetTickCount64();
+            }
+        }
+
         return true;
     }
 
     void Render() {
-        if (!s_showOverlay)
-            return;
+        MaybeReloadConfig();
+        if (!s_showOverlay) return;
 
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
         ImGuiIO& io = ImGui::GetIO();
-        if (s_customPosition) {
+        if (s_positionMode == PositionMode::Custom) {
             ImGui::SetNextWindowPos(ImVec2(s_posX, s_posY), ImGuiCond_Always, ImVec2(0.0f, 0.0f));
         } else {
-            ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - 8, 8), ImGuiCond_Always, ImVec2(1.0f, 0.0f));
+            float x = (s_corner == 0 || s_corner == 2) ? s_marginX : (io.DisplaySize.x - s_marginX);
+            float y = (s_corner == 0 || s_corner == 1) ? s_marginY : (io.DisplaySize.y - s_marginY);
+            float pivotX = (s_corner == 0 || s_corner == 2) ? 0.0f : 1.0f;
+            float pivotY = (s_corner == 0 || s_corner == 1) ? 0.0f : 1.0f;
+            ImGui::SetNextWindowPos(ImVec2(x, y), ImGuiCond_Always, ImVec2(pivotX, pivotY));
         }
         ImGui::SetNextWindowBgAlpha(s_alpha);
 
@@ -120,7 +295,7 @@ namespace Overlay {
     void SetPosition(float x, float y) {
         s_posX = x;
         s_posY = y;
-        s_customPosition = true;
+        s_positionMode = PositionMode::Custom;
     }
 
     void SetAlpha(float alpha) {

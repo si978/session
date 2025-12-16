@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "TASK-2025-12-16-0004",
+  "type": "task",
+  "status": "active",
+  "title": "增加 overlay.ini 配置：透明度/位置/热键",
+  "goal": "让用户无需改代码即可调整叠加层（alpha、位置、切换热键），并能在运行时热更新。",
+  "non_goals": [
+    "不做 GUI 配置界面（后续可在 launcher 菜单或单独窗口实现）",
+    "不实现完整的配置模块抽象（先以 overlay.ini 满足核心可用性）"
+  ],
+  "acceptance_criteria": [
+    "当 `overlay.ini` 存在于 `fps_overlay.dll` 同目录时，DLL 会读取并应用配置",
+    "支持：Alpha(0-1)、Corner(四角/Custom)、X/Y(自定义坐标)、MarginX/MarginY、ToggleKey(F1-F12)、Visible(0/1)",
+    "配置文件变更后 ≤ 1s 生效（无变更不做频繁 IO）",
+    "默认行为不变：无配置文件时仍为右上角 + alpha=0.25 + F1",
+    "memctl validate/check-stale/build-pack/validate-pack 通过"
+  ],
+  "pack": {
+    "include_memory_ids": [
+      "ADR-0001",
+      "CONSTRAINT-0001",
+      "RUNBOOK-0001"
+    ],
+    "include_paths": [
+      "docs/requirements.md",
+      "README.md",
+      "docs/USER_GUIDE.md",
+      "CMakeLists.txt",
+      "src/dllmain.cpp",
+      "src/hooks.h",
+      "src/hooks.cpp",
+      "src/overlay.h",
+      "src/overlay.cpp",
+      "src/launcher/main.cpp",
+      ".ai/README.md",
+      ".ai/config.json",
+      ".ai/tools/memctl.py",
+      ".ai/schemas/agent_report.schema.json",
+      ".github/workflows/ai_memory_validate.yml",
+      ".github/workflows/ai_context_pack.yml",
+      ".github/workflows/ai_pr_gate.yml",
+      ".github/PULL_REQUEST_TEMPLATE/ai.md",
+      "AGENTS.md",
+      "CODEOWNERS",
+      ".gitignore"
+    ]
+  },
+  "evidence": [
+    {
+      "kind": "repo_path",
+      "ref": "docs/requirements.md"
+    }
+  ]
+}
+

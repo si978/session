@@ -7,6 +7,7 @@
 - 实时显示 FPS 和帧时间
 - 根据 FPS 数值自动变色（绿/黄/红）
 - F1 热键切换显示/隐藏
+- overlay.ini 配置透明度/位置/热键（运行时热更新）
 - 低性能开销（< 1% CPU）
 
 ## 快速开始
@@ -38,6 +39,8 @@ cmake --build . --config Release
 # 以管理员身份运行
 injector.exe Game.exe
 ```
+
+可选：在 `fps_overlay.dll` 同目录创建/编辑 `overlay.ini` 来调整显示效果。
 
 ## 项目结构
 
