@@ -20,7 +20,7 @@
     "CODEOWNERS",
     "AGENTS.md"
   ],
-  "verification_note": "Watch paths narrowed to system surfaces (not .ai/memory) to avoid per-task false staleness; refreshed baseline.",
+  "verification_note": "Refreshed baseline after updating ai_memory_validate seed task id (system surface change).",
   "evidence": [
     {
       "kind": "repo_path",

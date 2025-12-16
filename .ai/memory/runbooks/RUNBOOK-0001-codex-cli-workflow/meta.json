@@ -13,6 +13,7 @@
     ".ai/tools/",
     ".github/workflows/"
   ],
+  "verification_note": "Touched after updating ai_memory_validate seed task id to keep runbook watch_paths baseline current.",
   "evidence": [
     {
       "kind": "repo_path",
@@ -20,4 +21,3 @@
     }
   ]
 }
-
