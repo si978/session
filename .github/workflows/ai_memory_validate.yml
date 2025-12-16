@@ -40,7 +40,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          TASK="TASK-2025-12-15-0001"
+          TASK="TASK-2025-12-16-0001"
           python .ai/tools/memctl.py build-pack --commit "${{ github.sha }}" --task-id "$TASK" --out pack_1.json
           python .ai/tools/memctl.py build-pack --commit "${{ github.sha }}" --task-id "$TASK" --out pack_2.json
           python .ai/tools/memctl.py validate-pack --pack pack_1.json --task-id "$TASK"
