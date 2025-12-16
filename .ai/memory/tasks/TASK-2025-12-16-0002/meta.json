@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "TASK-2025-12-16-0002",
+  "type": "task",
+  "status": "active",
+  "title": "实现 P0：FPS 小数精度 + 帧时间显示",
+  "goal": "让叠加层同时显示 FPS（1 位小数）与帧时间（ms），并保持数值平滑、更新及时。",
+  "non_goals": [
+    "不引入配置文件系统（位置/颜色/热键配置另开 TASK）",
+    "不扩展到 DX12/Vulkan（另开 TASK）"
+  ],
+  "acceptance_criteria": [
+    "叠加层显示 `FPS: xx.x`（小数点后 1 位）",
+    "叠加层显示 `Frame: yy.y ms`（小数点后 1 位）",
+    "显示值采用平滑样本（不直接逐帧抖动）",
+    "显示更新周期 ≤ 100ms",
+    "代码可编译（无新增编译错误）"
+  ],
+  "pack": {
+    "include_memory_ids": [
+      "ADR-0001",
+      "CONSTRAINT-0001",
+      "RUNBOOK-0001"
+    ],
+    "include_paths": [
+      "docs/requirements.md",
+      "README.md",
+      "CMakeLists.txt",
+      "src/overlay.h",
+      "src/overlay.cpp",
+      "src/fps_counter.h",
+      "src/fps_counter.cpp",
+      "src/hooks.h",
+      "src/hooks.cpp",
+      ".ai/README.md",
+      ".ai/config.json",
+      ".ai/tools/memctl.py",
+      ".ai/schemas/agent_report.schema.json",
+      ".github/workflows/ai_memory_validate.yml",
+      ".github/workflows/ai_context_pack.yml",
+      ".github/workflows/ai_pr_gate.yml",
+      ".github/PULL_REQUEST_TEMPLATE/ai.md",
+      "AGENTS.md",
+      "CODEOWNERS",
+      ".gitignore"
+    ]
+  },
+  "evidence": [
+    {
+      "kind": "repo_path",
+      "ref": "docs/requirements.md"
+    }
+  ]
+}
+

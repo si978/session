@@ -70,18 +70,20 @@ namespace Overlay {
                                   ImGuiWindowFlags_NoFocusOnAppearing;
 
         if (ImGui::Begin("##FPS", nullptr, flags)) {
-            int fps = FpsCounter::GetDisplayFps();
+            float fps = FpsCounter::GetDisplayFps();
+            float frameTimeMs = FpsCounter::GetDisplayFrameTime();
 
             ImVec4 textColor;
-            if (fps >= 60) {
+            if (fps >= 60.0f) {
                 textColor = ImVec4(0.2f, 1.0f, 0.2f, 1.0f);
-            } else if (fps >= 30) {
+            } else if (fps >= 30.0f) {
                 textColor = ImVec4(1.0f, 1.0f, 0.2f, 1.0f);
             } else {
                 textColor = ImVec4(1.0f, 0.2f, 0.2f, 1.0f);
             }
 
-            ImGui::TextColored(textColor, "FPS: %d", fps);
+            ImGui::TextColored(textColor, "FPS: %.1f", fps);
+            ImGui::TextColored(textColor, "Frame: %.1f ms", frameTimeMs);
         }
         ImGui::End();
 

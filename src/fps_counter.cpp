@@ -11,12 +11,13 @@ namespace FpsCounter {
     static TimePoint s_lastDisplayUpdate;
     static float s_fps = 0.0f;
     static float s_frameTime = 0.0f;
-    static int s_displayFps = 0;
+    static float s_displayFps = 0.0f;
     static float s_displayFrameTime = 0.0f;
     static std::deque<float> s_frameTimes;
     static constexpr size_t SAMPLE_COUNT = 60;
-    static constexpr long long DISPLAY_UPDATE_MS = 300;
+    static constexpr long long DISPLAY_UPDATE_MS = 80;
     static bool s_firstFrame = true;
+    static bool s_firstDisplay = true;
 
     void Update() {
         TimePoint now = Clock::now();
@@ -42,11 +43,19 @@ namespace FpsCounter {
             totalTime += t;
         }
         s_frameTime = totalTime / s_frameTimes.size();
-        s_fps = 1000.0f / s_frameTime;
+        s_fps = (s_frameTime > 0.0f) ? (1000.0f / s_frameTime) : 0.0f;
+
+        if (s_firstDisplay) {
+            s_displayFps = s_fps;
+            s_displayFrameTime = s_frameTime;
+            s_lastDisplayUpdate = now;
+            s_firstDisplay = false;
+            return;
+        }
 
         auto displayDuration = std::chrono::duration_cast<std::chrono::milliseconds>(now - s_lastDisplayUpdate);
         if (displayDuration.count() >= DISPLAY_UPDATE_MS) {
-            s_displayFps = static_cast<int>(s_fps + 0.5f);
+            s_displayFps = s_fps;
             s_displayFrameTime = s_frameTime;
             s_lastDisplayUpdate = now;
         }
@@ -60,7 +69,7 @@ namespace FpsCounter {
         return s_frameTime;
     }
 
-    int GetDisplayFps() {
+    float GetDisplayFps() {
         return s_displayFps;
     }
 
