@@ -1,0 +1,29 @@
+name: Windows Build
+
+on:
+  pull_request:
+    paths:
+      - "CMakeLists.txt"
+      - "src/**"
+      - "third_party/**"
+      - ".github/workflows/build_windows.yml"
+  push:
+    branches: ["main"]
+    paths:
+      - "CMakeLists.txt"
+      - "src/**"
+      - "third_party/**"
+      - ".github/workflows/build_windows.yml"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build -A x64
+
+      - name: Build (Release)
+        run: cmake --build build --config Release
+
