@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "TASK-2025-12-16-0006",
+  "type": "task",
+  "status": "active",
+  "title": "overlay.ini：FPS 平滑采样与显示刷新可配置",
+  "goal": "允许通过 overlay.ini 调整 FPS 采样窗口与显示更新周期，以便在不同游戏/帧率下取舍稳定性与响应速度。",
+  "non_goals": [
+    "不更换 FPS 算法（仍使用滑动窗口平均）",
+    "不做复杂统计输出（如 1% low）"
+  ],
+  "acceptance_criteria": [
+    "overlay.ini 支持 `SampleCount`（int）控制 FPS 平滑窗口长度",
+    "overlay.ini 支持 `DisplayUpdateMs`（int）控制显示值刷新周期",
+    "配置变更后 ≤ 1s 生效",
+    "缺省时保持当前默认：SampleCount=60、DisplayUpdateMs=80",
+    "更新默认 overlay.ini 模板与 docs/USER_GUIDE.md 的说明",
+    "memctl validate/check-stale/build-pack/validate-pack 通过"
+  ],
+  "pack": {
+    "include_memory_ids": [
+      "ADR-0001",
+      "CONSTRAINT-0001",
+      "RUNBOOK-0001"
+    ],
+    "include_paths": [
+      "docs/requirements.md",
+      "docs/USER_GUIDE.md",
+      "src/fps_counter.h",
+      "src/fps_counter.cpp",
+      "src/overlay.cpp",
+      "src/launcher/main.cpp",
+      ".ai/README.md",
+      ".ai/config.json",
+      ".ai/tools/memctl.py",
+      ".ai/schemas/agent_report.schema.json",
+      ".github/workflows/ai_memory_validate.yml",
+      ".github/workflows/ai_context_pack.yml",
+      ".github/workflows/ai_pr_gate.yml",
+      ".github/PULL_REQUEST_TEMPLATE/ai.md",
+      "AGENTS.md",
+      "CODEOWNERS",
+      ".gitignore"
+    ]
+  },
+  "evidence": [
+    {
+      "kind": "repo_path",
+      "ref": "docs/requirements.md"
+    }
+  ]
+}
+
