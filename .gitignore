@@ -30,9 +30,11 @@ cmake_install.cmake
 # Dependencies (downloaded separately)
 third_party/minhook/src/
 third_party/minhook/include/MinHook.h
+third_party/minhook/LICENSE*
 third_party/imgui/*.cpp
 third_party/imgui/*.h
 third_party/imgui/backends/
+third_party/imgui/LICENSE*
 
 # Keep placeholder files
 !**/.gitkeep

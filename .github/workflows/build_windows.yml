@@ -6,6 +6,7 @@ on:
       - "CMakeLists.txt"
       - "src/**"
       - "third_party/**"
+      - "scripts/download_deps.ps1"
       - ".github/workflows/build_windows.yml"
   push:
     branches: ["main"]
@@ -13,6 +14,7 @@ on:
       - "CMakeLists.txt"
       - "src/**"
       - "third_party/**"
+      - "scripts/download_deps.ps1"
       - ".github/workflows/build_windows.yml"
 
 jobs:
@@ -21,9 +23,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Download third-party deps
+        shell: pwsh
+        run: ./scripts/download_deps.ps1 -NonInteractive
+
       - name: Configure
         run: cmake -S . -B build -A x64
 
       - name: Build (Release)
         run: cmake --build build --config Release
-
