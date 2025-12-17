@@ -89,3 +89,13 @@ if(MSVC)
         LINK_FLAGS "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\""
     )
 endif()
+
+# ============================================================
+# Install (for CI artifacts)
+# ============================================================
+
+install(
+    TARGETS fps_overlay injector launcher
+    RUNTIME DESTINATION .
+    LIBRARY DESTINATION .
+)

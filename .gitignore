@@ -3,6 +3,7 @@ build/
 out/
 bin/
 lib/
+dist/
 
 # Lab build outputs
 lab/build/
