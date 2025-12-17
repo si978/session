@@ -15,7 +15,7 @@
     ".ai/tools/",
     ".github/workflows/"
   ],
-  "verification_note": "Touched after updating ai_memory_validate seed task id to align CI determinism checks with this repo.",
+  "verification_note": "Refreshed baseline after adding Windows build workflow (system surface change).",
   "supersedes": [],
   "evidence": [
     {
