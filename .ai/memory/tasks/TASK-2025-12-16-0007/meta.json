@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "TASK-2025-12-16-0007",
+  "type": "task",
+  "status": "active",
+  "title": "增加 Windows CI 编译工作流（V1）",
+  "goal": "在 GitHub Actions 上对 Windows/x64 进行 CMake 构建，确保每个 AI PR 都能编译通过，提升鲁棒性与可交付性。",
+  "non_goals": [
+    "不做发布/打包（Release artifact 另开 TASK）",
+    "不把第三方库源码直接提交进仓库（通过脚本获取）"
+  ],
+  "acceptance_criteria": [
+    "新增 GitHub Actions workflow：在 windows-latest 上构建 Release x64",
+    "workflow 在构建前运行 scripts/download_deps.ps1（非交互）补齐 third_party 源码",
+    "workflow 对 src/CMakeLists/third_party 变更触发（PR + main push）",
+    "本地 memctl validate/check-stale/build-pack/validate-pack 通过",
+    "PR 打 ai 标签后门禁通过"
+  ],
+  "pack": {
+    "include_memory_ids": [
+      "ADR-0001",
+      "CONSTRAINT-0001",
+      "RUNBOOK-0001"
+    ],
+    "include_paths": [
+      "CMakeLists.txt",
+      "src/",
+      "scripts/",
+      "third_party/",
+      ".github/workflows/",
+      ".ai/README.md",
+      ".ai/config.json",
+      ".ai/tools/memctl.py",
+      ".ai/schemas/agent_report.schema.json",
+      "AGENTS.md",
+      "CODEOWNERS",
+      ".gitignore"
+    ]
+  },
+  "evidence": [
+    {
+      "kind": "repo_path",
+      "ref": "CMakeLists.txt"
+    }
+  ]
+}
