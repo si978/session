@@ -12,7 +12,18 @@
 
 ## 快速开始
 
-### 1. 下载依赖
+### 方式 A：直接下载预编译（推荐）
+
+1. 打开 GitHub → Actions → 选择 `Windows Build` 工作流 → 下载 artifact：`fps-overlay-windows-x64`
+2. 解压后，以管理员身份运行 `launcher.exe`
+3. 首次运行会生成并打开 `games.txt`：每行填一个游戏进程名（例如 `Game.exe`），保存后重启 `launcher.exe`
+4. 正常启动游戏，叠加层会自动注入并显示（默认 F1 切换显示/隐藏）
+
+运行时配置：同目录 `overlay.ini`（`fps_overlay.dll` 运行时会自动热加载）。
+
+### 方式 B：从源码编译
+
+#### 1. 下载依赖
 
 运行 PowerShell 脚本自动下载：
 
@@ -24,7 +35,7 @@
 - [MinHook](https://github.com/TsudaKageyu/minhook) → `third_party/minhook/`
 - [ImGui](https://github.com/ocornut/imgui) → `third_party/imgui/`
 
-### 2. 编译
+#### 2. 编译
 
 ```bash
 mkdir build
@@ -33,14 +44,16 @@ cmake .. -A x64
 cmake --build . --config Release
 ```
 
-### 3. 使用
+#### 3. 使用
+
+推荐：以管理员身份运行 `launcher.exe`（托盘后台监控 `games.txt`，自动注入）。
+
+或使用注入器：
 
 ```bash
-# 以管理员身份运行
 injector.exe Game.exe
+injector.exe 12345
 ```
-
-可选：在 `fps_overlay.dll` 同目录创建/编辑 `overlay.ini` 来调整显示效果。
 
 ## 项目结构
 
@@ -54,6 +67,9 @@ fps-fresh/
 │   ├── logger.h             # 日志模块
 │   └── injector/
 │       └── main.cpp         # DLL 注入器
+│   └── launcher/
+│       ├── main.cpp         # 托盘后台监控 + 自动注入
+│       └── launcher.rc      # 图标/资源
 ├── third_party/
 │   ├── minhook/             # MinHook 库
 │   └── imgui/               # ImGui 库
@@ -83,8 +99,8 @@ fps-fresh/
 ## 系统要求
 
 - Windows 10/11 64 位
-- Visual Studio 2019 或更高版本
-- CMake 3.20 或更高版本
+- 仅运行：无需额外依赖（下载预编译产物即可）
+- 从源码编译：Visual Studio 2019 或更高版本、CMake 3.20 或更高版本
 
 ## 许可证
 
