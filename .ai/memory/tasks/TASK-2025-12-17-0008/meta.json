@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "TASK-2025-12-17-0008",
+  "type": "task",
+  "status": "active",
+  "title": "提供 Windows 预编译产物（Actions Artifact）并补齐使用说明（V1）",
+  "goal": "让用户无需本地安装 CMake/VS 也能从 GitHub Actions 下载可运行的 Windows/x64 构建产物，并在 README 中给出“最短路径”使用步骤。",
+  "non_goals": [
+    "不发布 GitHub Release（仅 Actions artifact）",
+    "不做代码签名/驱动级注入",
+    "不改变现有功能逻辑（只做打包与文档）"
+  ],
+  "acceptance_criteria": [
+    "Windows CI 在构建完成后生成 dist 并上传 artifact（包含 launcher.exe、injector.exe、fps_overlay.dll）",
+    "README 增加从 Actions 下载 artifact 与运行 launcher 的步骤（games.txt/overlay.ini 位置与行为）",
+    "本地 memctl validate/check-stale/build-pack/validate-pack 通过",
+    "PR 打 ai 标签后门禁通过（含 Windows build）"
+  ],
+  "pack": {
+    "include_memory_ids": [
+      "ADR-0001",
+      "CONSTRAINT-0001",
+      "RUNBOOK-0001"
+    ],
+    "include_paths": [
+      "README.md",
+      "docs/requirements.md",
+      "CMakeLists.txt",
+      "scripts/",
+      ".github/workflows/",
+      ".ai/README.md",
+      ".ai/config.json",
+      ".ai/tools/memctl.py",
+      ".ai/schemas/agent_report.schema.json",
+      "AGENTS.md",
+      "CODEOWNERS",
+      ".gitignore"
+    ]
+  },
+  "evidence": [
+    {
+      "kind": "repo_path",
+      "ref": "docs/requirements.md"
+    },
+    {
+      "kind": "repo_path",
+      "ref": ".github/workflows/build_windows.yml"
+    }
+  ]
+}
+
