@@ -84,6 +84,7 @@ fps-fresh/
 
 ## 文档
 
+- [怎么使用（本地文档）](docs/USAGE.md) - 从“直接运行”到“用 Codex CLI 持续迭代”的最短路径
 - [需求文档](docs/requirements.md) - 完整的项目需求和技术方案
 - [基础知识](docs/fps-basics.md) - FPS 原理、Hook 技术、ImGui 集成等
 
